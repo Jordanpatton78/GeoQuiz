@@ -1,0 +1,105 @@
+package com.example.jordan.geoquiz;
+
+import android.content.res.Configuration;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    private Button trueButton;
+    private Button falseButton;
+    private Button nextButton;
+    private TextView textView;
+    private TrueFalse[] questionBank=new TrueFalse[]{
+            new TrueFalse(R.string.question_text,false),
+            new TrueFalse(R.string.ocean_questions,true),
+            new TrueFalse(R.string.mideast_question,false),
+            new TrueFalse(R.string.africa_question,false),
+            new TrueFalse(R.string.americas_question,true),
+            new TrueFalse(R.string.asia_question,true),
+    };
+    private int currentIndex=0;
+    private Button previousButton;
+    private void checkAnswer(boolean userPressedTrue){
+        boolean answerIsTrue=questionBank[currentIndex].isTrueQuestion();
+        int messageResId=0;
+        if(userPressedTrue==answerIsTrue){
+            messageResId=R.string.correct_toast;
+        }else{
+            messageResId=R.string.incorrect_toast;
+        }
+        Toast.makeText(this,messageResId,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textView=findViewById(R.id.textView);
+        ImageView imageView=findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //If you wanted to replace a button with the imageView, use this onCLickListener().
+            }
+        });
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this,R.string.select_answer,Toast.LENGTH_SHORT).show();
+            }
+        });
+        int question=questionBank[currentIndex].getQuestion();
+        textView.setText(question);
+        trueButton=findViewById(R.id.True);
+        falseButton=findViewById(R.id.False);
+        trueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkAnswer(true);
+            }
+        });
+        falseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkAnswer(false);
+            }
+        });
+        nextButton=findViewById(R.id.next);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentIndex=(currentIndex+1)%questionBank.length;
+                int question=questionBank[currentIndex].getQuestion();
+                textView.setText(question);
+            }
+        });
+        previousButton=findViewById(R.id.previous);
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(currentIndex==0){
+                    currentIndex=5;
+                }
+                currentIndex=(currentIndex-1)%questionBank.length;
+                int question=questionBank[currentIndex].getQuestion();
+                textView.setText(question);
+            }
+        });
+    }
+    @Override
+    public void onConfigurationChanged(Configuration config){
+        super.onConfigurationChanged(config);
+        if(config.orientation==Configuration.ORIENTATION_PORTRAIT){
+            setContentView(R.layout.activity_main);
+        }
+        if(config.orientation==Configuration.ORIENTATION_LANDSCAPE){
+            setContentView(R.layout.activity_main_land);
+        }
+    }
+}
